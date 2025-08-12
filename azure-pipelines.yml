@@ -1,0 +1,43 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- none
+pool:
+ vmImage: windows-latest
+
+variables:
+  resourceGroupName: vnettest
+  location:east-us
+  vnetTemplate: azuredeploy.json
+  vnetParameter:azuredeploy.parameters.json
+
+- task: AzurePowerShell@5
+  inputs:
+    azureSubscription: 'Pay-As-You-Go(2)(5e9c64dc-3dac-48c5-addb-e286ad2aa905)'
+    ScriptType: 'InlineScript'
+    Inline: 'NewAzResourceGroup - Name $resoureGroupName -Location $location'
+    azurePowerShellVersion: 'LatestVersion'
+
+- task: AzureKeyVault@2
+  inputs:
+    azureSubscription: 'Pay-As-You-Go(5e9c64dc-3dac-48c5-addb-e286ad2aa905)'
+    KeyVaultName: 'ado-test'
+    SecretsFilter: '*'
+    RunAsPreJob: false
+
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'Pay-As-You-Go(5e9c64dc-3dac-48c5-addb-e286ad2aa905)'
+    subscriptionId: '5e9c64dc-3dac-48c5-addb-e286ad2aa905'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: '$resourceGroupName'
+    location: '$location'
+    templateLocation: 'Linked artifact'
+    csmFile: '$vnetTemplate'
+    csmParametersFile: '$vnetParameter'
+    deploymentMode: 'Incremental'
+    overrideParameter: "-adminUsername ($adminuser) -adminPassword ($adminpassword)"
