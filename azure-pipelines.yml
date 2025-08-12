@@ -9,14 +9,14 @@ pool:
  vmImage: windows-latest
 
 variables:
-  resourceGroupName: vnettest
-  location:east-us
-  vnetTemplate: azuredeploy.json
-  vnetParameter:azuredeploy.parameters.json
-
+  resourceGroupName: 'vnettest'
+  location: 'east-us'
+  vnetTemplate: 'azuredeploy.json'
+  vnetParameter: 'azuredeploy.parameters.json'
+steps:
 - task: AzurePowerShell@5
   inputs:
-    azureSubscription: 'Pay-As-You-Go(2)(5e9c64dc-3dac-48c5-addb-e286ad2aa905)'
+    azureSubscription: 'Pay-As-You-Go(5e9c64dc-3dac-48c5-addb-e286ad2aa905)'
     ScriptType: 'InlineScript'
     Inline: 'NewAzResourceGroup - Name $resoureGroupName -Location $location'
     azurePowerShellVersion: 'LatestVersion'
@@ -40,4 +40,4 @@ variables:
     csmFile: '$vnetTemplate'
     csmParametersFile: '$vnetParameter'
     deploymentMode: 'Incremental'
-    overrideParameter: "-adminUsername ($adminuser) -adminPassword ($adminpassword)"
+    overrideParameters: '-adminUsername ($adminuser) -adminPassword ($adminpassword)'
